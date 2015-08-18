@@ -266,7 +266,11 @@ void instance_karazhan::SetData(uint32 uiType, uint32 uiData)
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
                     if (Player* pPlayer = itr->getSource())
+                    {
                         pPlayer->RemoveAurasDueToSpell(SPELL_GAME_IN_SESSION);
+                        pPlayer->RemoveAurasDueToSpell(SPELL_IN_GAME);
+                    }
+
                 }
 
                 m_bFriendlyGame = false;
@@ -286,7 +290,10 @@ void instance_karazhan::SetData(uint32 uiType, uint32 uiData)
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
                     if (Player* pPlayer = itr->getSource())
+                    {
                         pPlayer->RemoveAurasDueToSpell(SPELL_GAME_IN_SESSION);
+                        pPlayer->RemoveAurasDueToSpell(SPELL_IN_GAME);
+                    }
                 }
 
                 m_uiChessResetTimer = 35000;

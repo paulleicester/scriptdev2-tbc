@@ -76,7 +76,6 @@ enum
     // SPELL_SQUARED_OCCUPIED       = 39399,                    // triggered by 39400; used to check if the square is occupied (if hits a target); Missing in 2.4.3
 
     // generic spells
-    SPELL_IN_GAME                   = 30532,                    // teleport player near the entrance
     SPELL_CONTROL_PIECE             = 30019,                    // control a chess piece
     SPELL_RECENTLY_IN_GAME          = 30529,                    // debuff on player after chess piece uncharm
 

@@ -104,6 +104,7 @@ enum
     // Chess event spells
     SPELL_CLEAR_BOARD               = 37366,                    // spell cast to clear the board at the end of the event
     SPELL_GAME_IN_SESSION           = 39331,                    // debuff on players received while the game is in session
+    SPELL_IN_GAME                   = 30532,                    // teleport player near the entrance - moved from chess_event
     SPELL_FORCE_KILL_BUNNY          = 45260,                    // triggers 45259
     SPELL_GAME_OVER                 = 39401,                    // cast by Medivh on game end
     SPELL_VICTORY_VISUAL            = 39395,                    // cast by the Victory controller on game end
