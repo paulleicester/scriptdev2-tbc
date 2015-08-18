@@ -46,8 +46,12 @@ void instance_blackrock_depths::OnCreatureCreate(Creature* pCreature)
 {
     switch (pCreature->GetEntry())
     {
-        case NPC_EMPEROR:
         case NPC_PRINCESS:
+            // replace the princess if required
+            if (CanReplacePrincess())
+                pCreature->UpdateEntry(NPC_PRIESTESS);
+            // no break;
+        case NPC_EMPEROR:
         case NPC_PHALANX:
         case NPC_HATEREL:
         case NPC_ANGERREL:
@@ -73,6 +77,21 @@ void instance_blackrock_depths::OnCreatureCreate(Creature* pCreature)
             // Store the Relict Vault Golems into m_sVaultNpcGuids
         case NPC_WATCHER_DOOMGRIP:
             m_sVaultNpcGuids.insert(pCreature->GetObjectGuid());
+            break;
+            // Arena crowd
+        case NPC_ARENA_SPECTATOR:
+        case NPC_SHADOWFORGE_PEASANT:
+        case NPC_SHADOWFORGE_CITIZEN:
+        case NPC_SHADOWFORGE_SENATOR:
+        case NPC_ANVILRAGE_SOLDIER:
+        case NPC_ANVILRAGE_MEDIC:
+        case NPC_ANVILRAGE_OFFICER:
+            if (pCreature->GetPositionZ() < aArenaCrowdVolume->m_fCenterZ || pCreature->GetPositionZ() > aArenaCrowdVolume->m_fCenterZ + aArenaCrowdVolume->m_uiHeight ||
+                    !pCreature->IsWithinDist2d(aArenaCrowdVolume->m_fCenterX, aArenaCrowdVolume->m_fCenterY, aArenaCrowdVolume->m_uiRadius))
+                break;
+            m_sArenaCrowdNpcGuids.insert(pCreature->GetObjectGuid());
+            if (m_auiEncounter[0] == DONE)
+                pCreature->SetFactionTemporary(FACTION_ARENA_NEUTRAL, TEMPFACTION_RESTORE_RESPAWN);
             break;
     }
 }
@@ -128,6 +147,14 @@ void instance_blackrock_depths::SetData(uint32 uiType, uint32 uiData)
             // If finished the arena event after theldren fight
             if (uiData == DONE && m_auiEncounter[0] == SPECIAL)
                 DoRespawnGameObject(GO_ARENA_SPOILS, HOUR);
+            else if (uiData == DONE)
+            {
+                for (GuidSet::const_iterator itr = m_sArenaCrowdNpcGuids.begin(); itr != m_sArenaCrowdNpcGuids.end(); ++itr)
+                {
+                    if (Creature* pSpectator = instance->GetCreature(*itr))
+                        pSpectator->SetFactionTemporary(FACTION_ARENA_NEUTRAL, TEMPFACTION_RESTORE_RESPAWN);
+                }
+            }
             m_auiEncounter[0] = uiData;
             break;
         case TYPE_VAULT:
@@ -398,6 +425,27 @@ void instance_blackrock_depths::DoCallNextDwarf()
     }
     m_uiDwarfFightTimer = 30000;
     ++m_uiDwarfRound;
+}
+
+// function that replaces the princess if requirements are met
+bool instance_blackrock_depths::CanReplacePrincess()
+{
+    Map::PlayerList const& players = instance->GetPlayers();
+    if (players.isEmpty())
+        return false;
+
+    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+    {
+        if (Player* pPlayer = itr->getSource())
+        {
+            // if at least one player didn't complete the quest, return false
+            if ((pPlayer->GetTeam() == ALLIANCE && !pPlayer->GetQuestRewardStatus(QUEST_FATE_KINGDOM))
+                    || (pPlayer->GetTeam() == HORDE && !pPlayer->GetQuestRewardStatus(QUEST_ROYAL_RESCUE)))
+                return false;
+        }
+    }
+
+    return true;
 }
 
 void instance_blackrock_depths::Update(uint32 uiDiff)

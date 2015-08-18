@@ -23,6 +23,7 @@ enum
 
     NPC_EMPEROR             = 9019,
     NPC_PRINCESS            = 8929,
+    NPC_PRIESTESS           = 10076,
     NPC_PHALANX             = 9502,
     NPC_HATEREL             = 9034,
     NPC_ANGERREL            = 9035,
@@ -42,6 +43,15 @@ enum
     NPC_JAZ                 = 9681,
     NPC_TOBIAS              = 9679,
     NPC_DUGHAL              = 9022,
+
+    // Arena crowd
+    NPC_ARENA_SPECTATOR     = 8916,
+    NPC_SHADOWFORGE_PEASANT = 8896,
+    NPC_SHADOWFORGE_CITIZEN = 8902,
+    NPC_SHADOWFORGE_SENATOR = 8904,
+    NPC_ANVILRAGE_SOLDIER   = 8893,
+    NPC_ANVILRAGE_MEDIC     = 8894,
+    NPC_ANVILRAGE_OFFICER   = 8895,
 
     GO_ARENA_1              = 161525,
     GO_ARENA_2              = 161522,
@@ -80,10 +90,25 @@ enum
     GO_DWARFRUNE_F01        = 170583,
     GO_DWARFRUNE_G01        = 170584,
 
+    QUEST_ROYAL_RESCUE      = 4003,                         // horde quest
+    QUEST_FATE_KINGDOM      = 4362,                         // alliance quest
+
     SPELL_STONED            = 10255,                        // Aura of Warbringer Constructs in Relict Vault
 
     FACTION_DWARF_HOSTILE   = 754,                          // Hostile faction for the Tomb of the Seven dwarfs
+    FACTION_ARENA_NEUTRAL   = 15,                           // Neutral faction for NPC in top of Arena after event complete
 };
+
+struct ArenaCylinder
+{
+    float m_fCenterX;
+    float m_fCenterY;
+    float m_fCenterZ;
+    uint32 m_uiRadius;
+    uint32 m_uiHeight;
+};
+
+static const ArenaCylinder aArenaCrowdVolume[] = {595.78f, -188.65f, -38.63f, 69, 10};
 
 enum ArenaNPCs
 {
@@ -154,9 +179,11 @@ class instance_blackrock_depths : public ScriptedInstance
         // Arena Event
         void SetArenaCenterCoords(float fX, float fY, float fZ) { m_fArenaCenterX = fX; m_fArenaCenterY = fY; m_fArenaCenterZ = fZ; }
         void GetArenaCenterCoords(float& fX, float& fY, float& fZ) { fX = m_fArenaCenterX; fY = m_fArenaCenterY; fZ = m_fArenaCenterZ; }
+        void GetArenaCrowdGuid(GuidSet& sCrowdSet) { sCrowdSet = m_sArenaCrowdNpcGuids; }
 
     private:
         void DoCallNextDwarf();
+        bool CanReplacePrincess();
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string m_strInstData;
@@ -170,6 +197,7 @@ class instance_blackrock_depths : public ScriptedInstance
         float m_fArenaCenterX, m_fArenaCenterY, m_fArenaCenterZ;
 
         GuidSet m_sVaultNpcGuids;
+        GuidSet m_sArenaCrowdNpcGuids;
 };
 
 #endif
